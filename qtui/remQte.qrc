@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="img">
+    <file>img/arle.png</file>
+    <file>img/arri.png</file>
+    <file>img/chdw.png</file>
+    <file>img/chup.png</file>
+    <file>img/pwr.png</file>
+  </qresource>
+</RCC>

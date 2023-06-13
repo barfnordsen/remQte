@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>271</height>
+    <width>371</width>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>remoQte</string>
+   <string>remQte</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -37,37 +37,7 @@
 padding:0 0 0 5;</string>
        </property>
        <property name="text">
-        <string>remoQte &gt;&gt; import channels &gt;&gt; finalize</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>351</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="font">
-        <font>
-         <pointsize>7</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>File import complete</string>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-       <property name="margin">
-        <number>5</number>
+        <string>remQte &gt;&gt; welcome</string>
        </property>
       </widget>
      </item>
@@ -95,12 +65,18 @@ padding:0 0 0 5;</string>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_6">
      <item>
-      <widget class="QPushButton" name="btnclose">
+      <widget class="QPushButton" name="btnscan">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>close</string>
+        <string>&amp;scan</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt+S</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -117,6 +93,36 @@ padding:0 0 0 5;</string>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
+      <widget class="QLabel" name="successlabel">
+       <property name="text">
+        <string>We are going to setup your remote now. There is no tvs.ini present or it is empty, so we need to scan your network(s) for your TV(s) first. Make sure your TV(s) are running for at least 1 minute and are connected to the same network as this computer.
+
+To proceed now, click [scan]</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>351</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
       <widget class="QLabel" name="label_3">
        <property name="font">
         <font>
@@ -127,29 +133,13 @@ padding:0 0 0 5;</string>
         </font>
        </property>
        <property name="text">
-        <string>Success!</string>
+        <string>Welcome to remQte!</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="successlabel">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
        </property>
       </widget>
      </item>
