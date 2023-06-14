@@ -24,9 +24,9 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>40</y>
+      <y>70</y>
       <width>131</width>
-      <height>191</height>
+      <height>161</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -42,7 +42,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>10</y>
        <width>111</width>
        <height>141</height>
       </rect>
@@ -284,22 +284,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-    <widget class="QComboBox" name="comboBox">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>111</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="currentText">
-      <string/>
-     </property>
-     <property name="currentIndex">
-      <number>-1</number>
-     </property>
     </widget>
    </widget>
    <widget class="QFrame" name="frame_2">
@@ -837,7 +821,7 @@ list</string>
       <x>10</x>
       <y>430</y>
       <width>191</width>
-      <height>21</height>
+      <height>22</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_5">
@@ -1135,7 +1119,7 @@ list</string>
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1263,6 +1247,34 @@ hub</string>
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>44</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>7</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 7pt &quot;Arial&quot;;background:#fff;color:#333;</string>
+    </property>
+    <property name="currentText">
+     <string/>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

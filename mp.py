@@ -177,7 +177,10 @@ class stvws:
         self.push('KEY_TXT_MIX')
     def prech(self):
         self.push('KEY_PRECH')
-
+    def channel(self, ch):
+        for c in str(ch):
+            self.digit(c)
+        self.enter()
 
 
 
@@ -227,12 +230,16 @@ class MainWindow(QMainWindow):
     print('running on:  %s'%platform)
     nett = networks()
     def __init__(self, *args, **kwargs):
+        global stv
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.counter = 0
-        uic.loadUi("./qtui/main_start.ui", self)
-        self.btnscan.clicked.connect(self.network)
-
+        if len(ini_tvs) == 0:
+            uic.loadUi("./qtui/main_start.ui", self)
+            self.btnscan.clicked.connect(self.network)
+        else:
+            stv = stvws()
+            uic.loadUi("./qtui/remote.ui", self)
 
         self.show()
         
@@ -243,6 +250,11 @@ class MainWindow(QMainWindow):
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.timeloop)
         self.timer.start()
+#            self.remote()
+    def start(self):
+        if len(ini_tvs)>0:
+            self.remote()
+            
     def network(self):
         uic.loadUi("./qtui/main_scan_choose_nets.ui", self)
         self.progressBar.setVisible(False)
@@ -398,6 +410,58 @@ class MainWindow(QMainWindow):
         s.btnsrc.clicked.connect(stv.source)
         s.btnchup.clicked.connect(stv.chup)
         s.btnchdw.clicked.connect(stv.chdw)
+        s.btnguide.clicked.connect(stv.guide)
+        s.btnchlist.clicked.connect(stv.chlist)
+        s.btnvoup.clicked.connect(stv.voup)
+        s.btnvodw.clicked.connect(stv.vodw)
+        s.btnmute.clicked.connect(stv.mute)
+        s.btntools.clicked.connect(stv.tools)
+        s.btninfo.clicked.connect(stv.info)
+        s.btnreturn.clicked.connect(stv.rtrn)
+        s.btnexit.clicked.connect(stv.exit)
+        s.btnup.clicked.connect(stv.up)
+        s.btndown.clicked.connect(stv.down)
+        s.btnleft.clicked.connect(stv.left)
+        s.btnright.clicked.connect(stv.right)
+        s.btnok.clicked.connect(stv.enter)
+        s.btnrwd.clicked.connect(stv.rwd)
+        s.btnplay.clicked.connect(stv.play)
+        s.btnfwd.clicked.connect(stv.fwd)
+        s.btnstop.clicked.connect(stv.stop)
+        s.btnpause.clicked.connect(stv.pause)
+        s.btnrec.clicked.connect(stv.rec)
+        s.btnred.clicked.connect(stv.red)
+        s.btngreen.clicked.connect(stv.green)
+        s.btnyellow.clicked.connect(stv.yellow)
+        s.btnblue.clicked.connect(stv.blue)
+        s.btn0.clicked.connect(CB(stv.digit,0))
+        s.btn1.clicked.connect(CB(stv.digit,1))
+        s.btn2.clicked.connect(CB(stv.digit,2))
+        s.btn3.clicked.connect(CB(stv.digit,3))
+        s.btn4.clicked.connect(CB(stv.digit,4))
+        s.btn5.clicked.connect(CB(stv.digit,5))
+        s.btn6.clicked.connect(CB(stv.digit,6))
+        s.btn7.clicked.connect(CB(stv.digit,7))
+        s.btn8.clicked.connect(CB(stv.digit,8))
+        s.btn9.clicked.connect(CB(stv.digit,9))
+        s.btntxt.clicked.connect(stv.txt)
+        s.btnpre.clicked.connect(stv.prech)
+        arial7 = QFont('Arial',7)
+        s.comboBox.setFont(arial7)
+        for i in ini_chn.sections():
+#            print("ini_chn[i]['type']",ini_chn[i]['name'],i)
+            s.comboBox.addItem(ini_chn[i]['name'], userData=i)
+        s.comboBox.currentIndexChanged.connect(s.pr)
+#        s.comboBox.styleSheet = 'font: 75 7 "Arial";'
+#        print("itemData",s.comboBox.itemData(0))
+
+    def pr(s,i):
+        stv.channel(s.comboBox.itemData(i))
+        #print('hier ->>>>>>>%s'%s.comboBox.itemData(i))
+        #return True
+
+
+
 
     def togglecb(self,checkstate,itm):
         self.importtvs[itm] = checkstate
@@ -406,6 +470,7 @@ class MainWindow(QMainWindow):
         self.counter +=1
         if self.counter%60==0:
             print("Counter: %d" % self.counter)
+
 class CB:
     def __init__(self, func, *args, **kwargs):
         self.func = func
@@ -416,5 +481,7 @@ class CB:
 
 app = QApplication([])
 window = MainWindow()
+t = QTimer()
+t.singleShot(1000,window.start)
 app.exec()
 
