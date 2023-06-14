@@ -74,6 +74,14 @@ class networks:
             else:
                 st = str(stream).split("\\r\\n")[3].split(' ')[11].replace('-',':')
             return st
+        elif platform.startswith('linux'):
+            stream = check_output(['/usr/bin/ip','neigh'],text=True)
+            lns = stream.split('\n')
+            st = '00:00:00:00:00:00'
+            for i in lns:
+                if ip in i:
+                    st = i.split(' ')[4]
+            return st
         else:
             return '00:00:00:00:00:00'
     def getnetwork(self,ip):
