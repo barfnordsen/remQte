@@ -12,7 +12,11 @@ import urllib
 from urllib import request
 import re
 from configparser import ConfigParser
+from subprocess import check_output
 co = ConfigParser()
+class pseudo:
+    pass
+
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -61,6 +65,17 @@ class networks:
         return self.data
     def set(self,event,ip):
         self.ifs[ip] = event
+    def getmac(self,ip,platform):
+        if platform.startswith('win'):
+    #    mac_address_validate_pattern = "^([0-9a-f]{2}[:-]){5}([0-9a-f]{2})$"
+            stream = check_output(['C:\Windows\System32\ARP.EXE','-g','%s'%ip])
+            if 'No ARP Entries Found.' in str(stream):
+                st = '00:00:00:00:00:00'
+            else:
+                st = str(stream).split("\\r\\n")[3].split(' ')[11].replace('-',':')
+            return st
+        else:
+            return '00:00:00:00:00:00'
     def getnetwork(self,ip):
         ip = ip.split('.')
         return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
@@ -136,7 +151,11 @@ class MainWindow(QMainWindow):
                 self.data = client.m_search(st='urn:schemas-upnp-org:device:MediaRenderer:1')
                 for x in self.data:
                     ip = x['location'].split('/')[2].split(':')[0]
-                    ips[ip] = x['location'] 
+                    ips[ip] = pseudo() 
+                    ips[ip].location = x['location'] 
+                    ips[ip].dst = ip
+                    ips[ip].src = i
+                    
             pg += 30
             progress_callback.emit(pg)
         u = urllib
@@ -145,10 +164,14 @@ class MainWindow(QMainWindow):
         pgup = round(20/len(ips))
         for k in ips:
             tvs[k] = {}
-            xml = u.request.urlopen(ips[k])
+            tvs[k]['src'] = ips[k].src
+            tvs[k]['dst'] = ips[k].dst
+            tvs[k]['mac'] = self.nett.getmac(ips[k].dst,self.platform)
+            xml = u.request.urlopen(ips[k].location)
             xml = xml.read()
             xml = ET.fromstring(xml)
             srch = ('friendlyName','modelName','ProductCap','manufacturer')
+
             for child in xml[1]:
                 key = child.tag.split('}')[1]
                 if key in srch:
@@ -213,12 +236,9 @@ class MainWindow(QMainWindow):
         #self.btnscan.clicked.disconnect()
         self.btnscan.clicked.connect(self.importTV)
     def importTV(self):
-        print('btnclicked')
         for i in self.importtvs:
-            print(i,self.importtvs[i])
             if self.importtvs[i] == True:
                 tvs = self.tvsfound
-                tvs[i]['ip'] = i
                 co[i] = tvs[i]
 
         with open('tvs.ini', 'w') as conf:
