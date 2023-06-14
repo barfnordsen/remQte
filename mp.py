@@ -53,7 +53,7 @@ class networks:
             netmask = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr','netmask':'no netmask'}])[0]['netmask']
             if ip != '127.0.0.1' and ip != 'No IP addr':
                 net = ip.split('.')
-                net = '%s.%s.%s.0'%(net[0],net[1],net[2])
+                net = self.getnetwork(ip)
                 self.ifs[ip] = "%s / %s"%(net,netmask)
     def dlna(self,address):
         self.client = SSDPClient(address=address)
@@ -165,7 +165,7 @@ class MainWindow(QMainWindow):
             
 
     def progress_fn(self, n):
-        self.lblDesc.setText("scanning %s ..."%self.scanning)
+        self.lblDesc.setText("scanning %s ..."%self.nett.getnetwork(self.scanning))
         self.progressBar.setValue(n)
 
 
