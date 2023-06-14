@@ -11,6 +11,8 @@ import xml.etree.ElementTree as ET
 import urllib
 from urllib import request
 import re
+from configparser import ConfigParser
+co = ConfigParser()
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -52,16 +54,13 @@ class networks:
             if ip != '127.0.0.1':
                 net = ip.split('.')
                 net = '%s.%s.%s.0'%(net[0],net[1],net[2])
-                print(net)
                 self.ifs[ip] = "%s / %s"%(net,netmask)
-        print(self.ifs)
     def dlna(self,address):
         self.client = SSDPClient(address=address)
         self.data = self.client.m_search(st='urn:schemas-upnp-org:device:MediaRenderer:1')
         return self.data
     def set(self,event,ip):
         self.ifs[ip] = event
-        print(self.ifs)
     def getnetwork(self,ip):
         ip = ip.split('.')
         return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
@@ -118,30 +117,12 @@ class MainWindow(QMainWindow):
         self.lblHead.setText("remQte >> scanning in progress")
         self.lblHeadline.setText("Scannning ...")
         self.lblDesc.setText("")
-        worker = Worker(self.ssdp) # Any other args, kwargs are passed to the run function
+        worker = Worker(self.ssdp)
         worker.signals.result.connect(self.print_output)
         worker.signals.finished.connect(self.thread_complete)
         worker.signals.progress.connect(self.progress_fn)
 
-        # Execute
         self.threadpool.start(worker)
-#        for i in nett.ifs:
-##            ssdp.append({'ip':i})
-#            print(i, nett.ifs[i])
-#            state = nett.ifs[i]
-#            if state == True:
-#                print('checked', i)
-#                self.lblDesc.setText("scanning %s ..."%nett.getnetwork(i))
-#                nwobj = {'ip':i,'data':nett.dlna(i)}
-#                self.lblDesc.setText("scanning %s ...\t[DONE]"%nett.getnetwork(i))
-#                pg +=40
-#                self.progressBar.setValue(pg)
-#                ssdp.append(nwobj)
-#            elif state == False:
-#                pg += 40
-#                self.progressBar.setValue(pg)
-#            self.update()
-#        dbug(ssdp)
     def ssdp(self, progress_callback):
         pg = 0;
         ips = {}
@@ -151,9 +132,7 @@ class MainWindow(QMainWindow):
             progress_callback.emit(pg)
             if self.nett.ifs[i] == True:
                 client = SSDPClient(address=i)
-#                print(dir(client.m_search))
                 self.data = client.m_search(st='urn:schemas-upnp-org:device:MediaRenderer:1')
- #               print(len(self.data),self.data)
                 for x in self.data:
                     ip = x['location'].split('/')[2].split(':')[0]
                     ips[ip] = x['location'] 
@@ -161,12 +140,10 @@ class MainWindow(QMainWindow):
             progress_callback.emit(pg)
         u = urllib
         self.tvsfound = {}
-        print(len(ips))
         tvs = {}
         pgup = round(20/len(ips))
         for k in ips:
             tvs[k] = {}
-            print(k)
             xml = u.request.urlopen(ips[k])
             xml = xml.read()
             xml = ET.fromstring(xml)
@@ -185,23 +162,12 @@ class MainWindow(QMainWindow):
             pg += pgup
             progress_callback.emit(pg)
         self.tvsfound = tvs
-        print(tvs)
             
 
     def progress_fn(self, n):
         self.lblDesc.setText("scanning %s ..."%self.scanning)
         self.progressBar.setValue(n)
-        print("%s done" % n)
 
-    def execute_this_fn(self, progress_callback):
-        for n in range(1, 6):
-            time.sleep(1)
-            mul = (n*100)
-            div = int(mul/5)
-            print(n,mul,div)
-            progress_callback.emit(div)
-
-        return "Done."
 
     def print_output(self, s):
         print(s)
@@ -210,35 +176,56 @@ class MainWindow(QMainWindow):
         uic.loadUi("./qtui/main_scan_nets.ui", self)
         tb = self.tableWidget
         it = QTableWidgetItem
-        tb.setColumnCount(2)
-        tb.setHorizontalHeaderLabels(("TV","compatible"))
+        tb.setColumnCount(3)
+        tb.setColumnWidth(0, 10);
+        tb.setColumnWidth(1, 230);
+        tb.setColumnWidth(2, 65);
+        tb.setHorizontalHeaderLabels(("cb","TV","supported"))
         tb.setRowCount(len(self.tvsfound))
         print("THREAD COMPLETE!")
         o = 0
+        cbox = {}
+        self.importtvs = {}
         for itm in self.tvsfound:
             i = self.tvsfound[itm]
-            tb.setItem(o,0, it("%s (%s)"%(i['friendlyName'],itm)))
+#            self.importtvs[itm] = True
+            cbox[itm] = {}
+            cbox[itm]['Qcb'] = QCheckBox()
+            cbox[itm]['Qcb'].toggled.connect(CB(self.togglecb,itm))
+            cbox[itm]['Qcb'].setStyleSheet("margin:0 0 0 12")
+            cbox[itm]['Qcb'].setChecked(True)
+#            cbox[itm].config(padx=5)
+            tb.setCellWidget(o,0, cbox[itm]['Qcb'])
+            tb.setItem(o,1, it("%s (%s)"%(i['friendlyName'],itm)))
             comp = 'YES'
             try:
                 if i['incompatible']:
+#                    self.importtvs[itm]=False
                     comp = 'NO'
+                    cbox[itm]['Qcb'].setEnabled(False)
+                    cbox[itm]['Qcb'].setChecked(False)
             except:
                 print('jibbet nich')
-            tb.setItem(o,1, it(comp))
-            print(dir(tb.currentRow()))
+            tb.setItem(o,2, it(comp))
 #           tb.setItem(o,2, it(itm['type']))
             o += 1
+        #self.btnscan.clicked.disconnect()
+        self.btnscan.clicked.connect(self.importTV)
+    def importTV(self):
+        print('btnclicked')
+        for i in self.importtvs:
+            print(i,self.importtvs[i])
+            if self.importtvs[i] == True:
+                tvs = self.tvsfound
+                tvs[i]['ip'] = i
+                co[i] = tvs[i]
 
-    def oh_no(self):
-    # Pass the function to execute
-        worker = Worker(self.execute_this_fn) # Any other args, kwargs are passed to the run function
-        worker.signals.result.connect(self.print_output)
-        worker.signals.finished.connect(self.thread_complete)
-        worker.signals.progress.connect(self.progress_fn)
+        with open('tvs.ini', 'w') as conf:
+            co.write(conf)
 
-        # Execute
-        self.threadpool.start(worker)
-
+        uic.loadUi("./qtui/remote.ui",self)
+    def togglecb(self,checkstate,itm):
+        self.importtvs[itm] = checkstate
 
     def timeloop(self):
         self.counter +=1
@@ -260,19 +247,14 @@ class networks:
             if ip != '127.0.0.1':
                 net = ip.split('.')
                 net = '%s.%s.%s.0'%(net[0],net[1],net[2])
-                print(net)
                 self.ifs[ip] = "%s / %s"%(net,netmask)
-        print(self.ifs)
     def dlna(self,address):
         self.client = SSDPClient(address=address)
         self.data = self.client.m_search(st='urn:schemas-upnp-org:device:MediaRenderer:1')
         return self.data
 #        for i in self.data:
- #           print(i['location'])
     def set(self,event,ip):
         self.ifs[ip] = event
-        print(self.ifs)
-#        print(self.data)
     def getnetwork(self,ip):
         ip = ip.split('.')
         return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
