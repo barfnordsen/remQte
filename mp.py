@@ -13,7 +13,12 @@ from urllib import request
 import re
 from configparser import ConfigParser
 from subprocess import check_output
+from samsungtvws import SamsungTVWS
 co = ConfigParser()
+ini_tvs = ConfigParser()
+ini_tvs.read("tvs.ini")
+ini_chn = ConfigParser()
+ini_chn.read("channels.ini")
 class pseudo:
     pass
 
@@ -49,6 +54,134 @@ class Worker(QRunnable):
         finally:
             self.signals.finished.emit()
 
+class stvws:
+    port = 8002
+    name = 'remQte'
+    default = '192.168.2.134'
+    cnf = {}
+    def __init__(self):
+    
+        cnf = {}
+        ini_tvs.read('tvs.ini')
+        for i in ini_tvs.sections():
+            c = ini_tvs[i]
+            cnf[i] = pseudo()
+            cnf[i].src = c['src']
+            cnf[i].dst = c['dst']
+            cnf[i].mac = c['mac']
+            cnf[i].token = c['token']
+            cnf[i].friendlyName = c['friendlyName']
+            cnf[i].manufacturer = c['manufacturer']
+            cnf[i].modelname = c['modelname']
+            cnf[i].productcap = c['productcap']
+            cnf[i].port = self.port
+            cnf[i].name = self.name
+            cnf[i].tv = SamsungTVWS(c['dst'],port=self.port,token=c['token'],name=self.name)
+        self.cnf = cnf
+        self.setDefault(i)
+
+        print(len(cnf))
+        
+    def setDefault(self,ip):
+        print(self.cnf)
+        self.default = ip
+        self.rc = self.cnf[ip]
+    def register(self):
+        t = self.rc.tv
+        t.open()
+        if t.token != self.rc.token:
+            print('token changed.')
+            self.__updToken(t.token)
+        print(t.token)
+        t.close()
+    def __updToken(self,token):
+        self.rc.token = token
+        self.cnf[self.default].token = token
+        ini_tvs[self.default]['token'] = token
+        with open('tvs.ini', 'w') as conf:
+            ini_tvs.write(conf)
+    def push(self, btn, val=""):
+        t = self.rc.tv
+        t.open()
+        if t.token != self.rc.token:
+            print('new token')
+            self.__updToken(t.token)
+            t.close()
+            self.push(btn,val)
+        t.send_key(btn)
+        t.close()
+    def pwr(self):
+        self.push('KEY_POWER')
+    def menu(self):
+        self.push('KEY_MENU')
+    def smarthub(self):
+        self.push('KEY_HOME')
+    def source(self):
+        self.push('KEY_SOURCE')
+    def chup(self):
+        self.push('KEY_CHUP')
+    def chdw(self):
+        self.push('KEY_CHDOWN')
+    def guide(self):
+        self.push('KEY_GUIDE')
+    def chlist(self):
+        self.push('KEY_CH_LIST')
+    def voup(self):
+        self.push('KEY_VOLUP')
+    def vodw(self):
+        self.push('KEY_VOLDOWN')
+    def mute(self):
+        self.push('KEY_MUTE')
+    def up(self):
+        self.push('KEY_UP')
+    def down(self):
+        self.push('KEY_DOWN')
+    def left(self):
+        self.push('KEY_LEFT')
+    def right(self):
+        self.push('KEY_RIGHT')
+    def enter(self):
+        self.push('KEY_ENTER')
+    def tools(self):
+        self.push('KEY_TOOLS')
+    def info(self):
+        self.push('KEY_INFO')
+    def rtrn(self):
+        self.push('KEY_RETURN')
+    def exit(self):
+        self.push('KEY_EXIT')
+    def rwd(self):
+        self.push('KEY_REWIND')
+    def play(self):
+        self.push('KEY_PLAY')
+    def fwd(self):
+        self.push('KEY_FF')
+    def stop(self):
+        self.push('KEY_STOP')
+    def pause(self):
+        self.push('KEY_PAUSE')
+    def rec(self):
+        self.push('KEY_REC')
+    def red(self):
+        self.push('KEY_RED')
+    def green(self):
+        self.push('KEY_GREEN')
+    def yellow(self):
+        self.push('KEY_YELLOW')
+    def blue(self):
+        self.push('KEY_BLUE')
+    def digit(self,d):
+        d = str(d)
+        self.push('KEY_%s'%d)
+    def txt(self):
+        self.push('KEY_TXT_MIX')
+    def prech(self):
+        self.push('KEY_PRECH')
+
+
+
+
+stv = None
 class networks:
     ifs = {}
     def get(self):
@@ -175,6 +308,8 @@ class MainWindow(QMainWindow):
             tvs[k]['src'] = ips[k].src
             tvs[k]['dst'] = ips[k].dst
             tvs[k]['mac'] = self.nett.getmac(ips[k].dst,self.platform)
+            tvs[k]['token'] = 'remQte'
+            tvs[k]['default'] = True
             xml = u.request.urlopen(ips[k].location)
             xml = xml.read()
             xml = ET.fromstring(xml)
@@ -244,6 +379,7 @@ class MainWindow(QMainWindow):
         #self.btnscan.clicked.disconnect()
         self.btnscan.clicked.connect(self.importTV)
     def importTV(self):
+        global stv
         for i in self.importtvs:
             if self.importtvs[i] == True:
                 tvs = self.tvsfound
@@ -251,8 +387,18 @@ class MainWindow(QMainWindow):
 
         with open('tvs.ini', 'w') as conf:
             co.write(conf)
+            ini_tvs.read('tvs.ini')
+        stv = stvws()
+        self.remote()
+    def remote(s):
+        
+        uic.loadUi("./qtui/remote.ui",s)
+        s.btnpwr.clicked.connect(stv.pwr)
+        s.btnsmarthub.clicked.connect(stv.smarthub)
+        s.btnsrc.clicked.connect(stv.source)
+        s.btnchup.clicked.connect(stv.chup)
+        s.btnchdw.clicked.connect(stv.chdw)
 
-        uic.loadUi("./qtui/remote.ui",self)
     def togglecb(self,checkstate,itm):
         self.importtvs[itm] = checkstate
 
