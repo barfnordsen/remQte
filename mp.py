@@ -49,9 +49,9 @@ class networks:
     ifs = {}
     def get(self):
         for iface in interfaces():
-            ip = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr'}] )[0]['addr']
-            netmask = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr'}] )[0]['netmask']
-            if ip != '127.0.0.1':
+            ip = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr','netmask':'no netmask'}] )[0]['addr']
+            netmask = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr','netmask':'no netmask'}])[0]['netmask']
+            if ip != '127.0.0.1' and ip != 'No IP addr':
                 net = ip.split('.')
                 net = '%s.%s.%s.0'%(net[0],net[1],net[2])
                 self.ifs[ip] = "%s / %s"%(net,netmask)
@@ -238,26 +238,7 @@ class CB:
         self.kwargs = kwargs
     def __call__(self,event):
         self.func(event,*self.args, **self.kwargs)
-class networks:
-    ifs = {}
-    def get(self):
-        for iface in interfaces():
-            ip = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr'}] )[0]['addr']
-            netmask = ifaddresses(iface).setdefault(AF_INET, [{'addr':'No IP addr'}] )[0]['netmask']
-            if ip != '127.0.0.1':
-                net = ip.split('.')
-                net = '%s.%s.%s.0'%(net[0],net[1],net[2])
-                self.ifs[ip] = "%s / %s"%(net,netmask)
-    def dlna(self,address):
-        self.client = SSDPClient(address=address)
-        self.data = self.client.m_search(st='urn:schemas-upnp-org:device:MediaRenderer:1')
-        return self.data
-#        for i in self.data:
-    def set(self,event,ip):
-        self.ifs[ip] = event
-    def getnetwork(self,ip):
-        ip = ip.split('.')
-        return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
+
 app = QApplication([])
 window = MainWindow()
 app.exec()
