@@ -1276,6 +1276,19 @@ hub</string>
      <number>-1</number>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnimportchannels">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>43</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>import channels</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

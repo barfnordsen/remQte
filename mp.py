@@ -493,9 +493,11 @@ class MainWindow(QMainWindow):
         s.btnpre.clicked.connect(stv.prech)
         arial7 = QFont('Arial',7)
         s.comboBox.setFont(arial7)
+        if len(ini_chn.sections())>0:
+            s.btnimportchannels.setVisible(False)
         for i in ini_chn.sections():
 #            print("ini_chn[i]['type']",ini_chn[i]['name'],i)
-            s.comboBox.addItem(ini_chn[i]['name'], userData=i)
+            s.comboBox.addItem("%s %s"%(ini_chn[i]['type'].upper(), ini_chn[i]['name']), userData=i)
         s.comboBox.currentIndexChanged.connect(s.pr)
 #        s.comboBox.styleSheet = 'font: 75 7 "Arial";'
 #        print("itemData",s.comboBox.itemData(0))
