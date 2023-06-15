@@ -203,7 +203,6 @@ class networks:
         self.ifs[ip] = event
     def getmac(self,ip,platform):
         if platform.startswith('win'):
-    #    mac_address_validate_pattern = "^([0-9a-f]{2}[:-]){5}([0-9a-f]{2})$"
             stream = check_output(['C:\Windows\System32\ARP.EXE','-g','%s'%ip])
             if 'No ARP Entries Found.' in str(stream):
                 st = '00:00:00:00:00:00'
