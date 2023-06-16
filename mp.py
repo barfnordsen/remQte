@@ -461,6 +461,7 @@ class MainWindow(QMainWindow):
         stv = stvws()
         self.remote()
     def remote(s):
+        s.img.remQte = QIcon(resource_path("./qtui/img/icon.png"))
         s.img.pwr = QIcon(resource_path("./qtui/img/pwr.png"))
         s.img.up = QIcon(resource_path("./qtui/img/chup.png"))
         s.img.down = QIcon(resource_path("./qtui/img/chdw.png"))
@@ -468,6 +469,7 @@ class MainWindow(QMainWindow):
         s.img.right = QIcon(resource_path("./qtui/img/arri.png"))
 
         uic.loadUi("./qtui/remote.ui",s)
+        s.setWindowIcon(s.img.remQte)
         s.btnpwr.clicked.connect(stv.pwr)
         s.btnpwr.setIcon(s.img.pwr)
         s.btnsmarthub.clicked.connect(stv.smarthub)
