@@ -7,8 +7,8 @@ co = ConfigParser()
 class channels:
     chnnls = []
     def add(self,row):
-        itm = {'channel':row[0],'name':row[1],'type':'tv'}
-        if int(row[0]) >= 1000:
+        itm = {'channel':row['Channel no.'],'name':row['Name'],'type':'tv'}
+        if int(row['Channel no.']) >= 1000:
             itm['type'] = 'radio'
         self.chnnls.append(itm)
 c = channels()
@@ -72,10 +72,12 @@ class append(QtWidgets.QMainWindow):
     def __import(self):
         c.chnnls = []
         with open(self.csvfile,'r',newline='\n') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=";")
-            next(spamreader)
-            for row in spamreader:
-                c.add(row)
+#            spamreader = csv.reader(csvfile, delimiter=";")
+            data = list(csv.DictReader(csvfile, delimiter=";"))
+            print(data)
+ #           next(spamreader)
+            for row in data:
+               c.add(row)
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     win = append()
