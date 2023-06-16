@@ -6,7 +6,7 @@ from PyQt6.QtCore import *
 from ssdpy import SSDPClient
 from netifaces import interfaces, ifaddresses, AF_INET
 import time
-import traceback, sys
+import traceback, sys, os
 import xml.etree.ElementTree as ET
 import urllib
 from urllib import request
@@ -23,7 +23,13 @@ ini_chn = ConfigParser()
 ini_chn.read("channels.ini")
 class pseudo:
     pass
+def resource_path(relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
 
+        return os.path.join(base_path, relative_path)
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -83,23 +89,23 @@ class stvws:
             cnf[i].tv = SamsungTVWS(c['dst'],port=self.port,token=c['token'],name=self.name)
         self.cnf = cnf
         self.setDefault(i)
-        print(len(cnf))
+        #print(len(cnf))
     def newwrkr(self):
         self.worker = Worker(self.pushworker)
         self.worker.signals.finished.connect(self.workerdone)
-        self.worker.signals.progress.connect(print)
+#        self.worker.signals.progress.connect(pseudo)
 
     def setDefault(self,ip):
-        print(self.cnf)
+        #print(self.cnf)
         self.default = ip
         self.rc = self.cnf[ip]
     def register(self):
         t = self.rc.tv
         t.open()
         if t.token != self.rc.token:
-            print('token changed.')
+            #print('token changed.')
             self.__updToken(t.token)
-        print(t.token)
+        #print(t.token)
         t.close()
     def __updToken(self,token):
         self.rc.token = token
@@ -110,7 +116,7 @@ class stvws:
     def push(self, btn, val=""):
         if window.tvup:
             self.pque.append(btn)
-            print('queing:%s'%btn)
+            #print('queing:%s'%btn)
 #            print(self.pque)
 #            self.pushworker()
 #            t = self.rc.tv
@@ -125,29 +131,29 @@ class stvws:
         elif window.tvup==False and btn == 'KEY_POWER':
             wakeonlan.send_magic_packet(self.rc.mac, interface=self.rc.src)
     def pushworker(self, progress_callback):
-        print('worker start')
+        #print('worker start')
         if len(self.pque) > 0:
             t = self.rc.tv
             t.open()
             q = self.pque
-            print(len(q))
+            #print(len(q))
             rm = []
             for i in q:
                 if t.token != self.rc.token:
-                    print('new token')
+                    #print('new token')
                     self.__updToken(t.token)
                     self.push(i)
                     t.close() 
-                print("worker: sending key: %s"%i)
+                #print("worker: sending key: %s"%i)
                 t.send_key(i)
                 rm.append(i)
 #                self.pque.remove(i)
             t.close()
             for i in rm:
-                print('worker: removing %s from queue'%i)
+                #print('worker: removing %s from queue'%i)
                 self.pque.remove(i)
     def workerdone(self):
-        print('worker.stop')
+        #print('worker.stop')
         window.stvw = False
     def pwr(self):
         self.push('KEY_POWER')
@@ -219,7 +225,7 @@ class stvws:
     def channel(self, ch):
         for c in str(ch):
             self.push('KEY_%s'%c)
-
+        self.push('KEY_ENTER')
 
 
 stv = None
@@ -262,10 +268,10 @@ class networks:
         return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
     def png(self,remoteip):
         if sys.platform.startswith('win'):
-            pngstr = 'ping -n 1 -w 10 %s'%remoteip
+            ping = sp.Popen('ping -n 1 -w 10 %s'%remoteip,stdout=sp.PIPE)
         else:
             pngstr = '/usr/bin/ping'
-        ping = sp.Popen([pngstr,'-W 0.2','-c 1',remoteip],stdout=sp.PIPE)
+            ping = sp.Popen([pngstr,'-W 0.2','-c 1',remoteip],stdout=sp.PIPE)
         streamdata = ping.communicate()[0]
         rc = ping.returncode
         return rc
@@ -273,8 +279,9 @@ class networks:
 
 class MainWindow(QMainWindow):
     platform = sys.platform
-    print('running on:  %s'%platform)
+    #print('running on:  %s'%platform)
     nett = networks()
+    img = pseudo()
     tvup = False
     stvw = False
     def __init__(self, *args, **kwargs):
@@ -293,7 +300,7 @@ class MainWindow(QMainWindow):
         self.show()
         
         self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+        #print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
         self.timer = QTimer()
         self.timer.setInterval(1000)
@@ -398,7 +405,8 @@ class MainWindow(QMainWindow):
 
 
     def print_output(self, s):
-        print(s)
+        pass
+        #print(s)
 
     def thread_complete(self):
         uic.loadUi("./qtui/main_scan_nets.ui", self)
@@ -410,7 +418,7 @@ class MainWindow(QMainWindow):
         tb.setColumnWidth(2, 65);
         tb.setHorizontalHeaderLabels(("cb","TV","supported"))
         tb.setRowCount(len(self.tvsfound))
-        print("THREAD COMPLETE!")
+        #print("THREAD COMPLETE!")
         o = 0
         cbox = {}
         self.importtvs = {}
@@ -433,7 +441,8 @@ class MainWindow(QMainWindow):
                     cbox[itm]['Qcb'].setEnabled(False)
                     cbox[itm]['Qcb'].setChecked(False)
             except:
-                print('jibbet nich')
+                #print('jibbet nich')
+                pass
             tb.setItem(o,2, it(comp))
 #           tb.setItem(o,2, it(itm['type']))
             o += 1
@@ -452,26 +461,40 @@ class MainWindow(QMainWindow):
         stv = stvws()
         self.remote()
     def remote(s):
-        
+        s.img.pwr = QIcon(resource_path("./qtui/img/pwr.png"))
+        s.img.up = QIcon(resource_path("./qtui/img/chup.png"))
+        s.img.down = QIcon(resource_path("./qtui/img/chdw.png"))
+        s.img.left = QIcon(resource_path("./qtui/img/arle.png"))
+        s.img.right = QIcon(resource_path("./qtui/img/arri.png"))
+
         uic.loadUi("./qtui/remote.ui",s)
         s.btnpwr.clicked.connect(stv.pwr)
+        s.btnpwr.setIcon(s.img.pwr)
         s.btnsmarthub.clicked.connect(stv.smarthub)
         s.btnsrc.clicked.connect(stv.source)
         s.btnchup.clicked.connect(stv.chup)
+        s.btnchup.setIcon(s.img.up)
         s.btnchdw.clicked.connect(stv.chdw)
+        s.btnchdw.setIcon(s.img.down)
         s.btnguide.clicked.connect(stv.guide)
         s.btnchlist.clicked.connect(stv.chlist)
         s.btnvoup.clicked.connect(stv.voup)
+        s.btnvoup.setIcon(s.img.up)
         s.btnvodw.clicked.connect(stv.vodw)
+        s.btnvodw.setIcon(s.img.down)
         s.btnmute.clicked.connect(stv.mute)
         s.btntools.clicked.connect(stv.tools)
         s.btninfo.clicked.connect(stv.info)
         s.btnreturn.clicked.connect(stv.rtrn)
         s.btnexit.clicked.connect(stv.exit)
         s.btnup.clicked.connect(stv.up)
+        s.btnup.setIcon(s.img.up)
         s.btndown.clicked.connect(stv.down)
+        s.btndown.setIcon(s.img.down)
         s.btnleft.clicked.connect(stv.left)
+        s.btnleft.setIcon(s.img.left)
         s.btnright.clicked.connect(stv.right)
+        s.btnright.setIcon(s.img.right)
         s.btnok.clicked.connect(stv.enter)
         s.btnrwd.clicked.connect(stv.rwd)
         s.btnplay.clicked.connect(stv.play)
@@ -528,13 +551,13 @@ class MainWindow(QMainWindow):
             self.stvw = True
             stv.newwrkr()
             self.threadpool.start(stv.worker)
-            print(self.stvw,len(stv.pque))
+            #print(self.stvw,len(stv.pque))
 
         if self.counter%10==0:
             self.tvup = True if self.nett.png(stv.default) == 0 else False
-        if self.counter%120==0:
-            print("Counter: %d" % self.counter)
-            print("TV UP: %s" % self.tvup)
+        if self.counter%120==0 or self.counter=='3':
+            #print("Counter: %d" % self.counter)
+            #print("TV UP: %s" % self.tvup)
 
 class CB:
     def __init__(self, func, *args, **kwargs):
