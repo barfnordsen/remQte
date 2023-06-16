@@ -556,6 +556,7 @@ class MainWindow(QMainWindow):
         if self.counter%10==0:
             self.tvup = True if self.nett.png(stv.default) == 0 else False
         if self.counter%120==0 or self.counter=='3':
+            pass
             #print("Counter: %d" % self.counter)
             #print("TV UP: %s" % self.tvup)
 
