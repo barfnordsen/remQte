@@ -261,7 +261,11 @@ class networks:
         ip = ip.split('.')
         return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
     def png(self,remoteip):
-        ping = sp.Popen('ping -n 1 -w 10 %s'%remoteip,stdout=sp.PIPE)
+        if sys.platform.startswith('win'):
+            pngstr = 'ping -n 1 -w 10 %s'%remoteip
+        else:
+            pngstr = '/usr/bin/ping'
+        ping = sp.Popen([pngstr,'-W 0.2','-c 1',remoteip],stdout=sp.PIPE)
         streamdata = ping.communicate()[0]
         rc = ping.returncode
         return rc
