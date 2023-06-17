@@ -524,6 +524,7 @@ class MainWindow(QMainWindow):
         s.btn9.clicked.connect(CB(stv.digit,9))
         s.btntxt.clicked.connect(stv.txt)
         s.btnpre.clicked.connect(stv.prech)
+        s.actionexit.triggered.connect(app.quit)
         arial7 = QFont('Arial',7)
         s.comboBox.setFont(arial7)
         if len(ini_chn.sections())>0:

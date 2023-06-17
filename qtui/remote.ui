@@ -1310,8 +1310,9 @@ hub</string>
    </widget>
    <widget class="QMenu" name="menuTV">
     <property name="title">
-     <string>TV</string>
+     <string>T&amp;V</string>
     </property>
+    <addaction name="action_Discover"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menuTV"/>
@@ -1319,7 +1320,12 @@ hub</string>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionexit">
    <property name="text">
-    <string>exit</string>
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="action_Discover">
+   <property name="text">
+    <string>&amp;Discover</string>
    </property>
   </action>
  </widget>
