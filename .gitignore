@@ -1,0 +1,5 @@
+.*
+*~
+*.ini
+*.exe
+__pycache__

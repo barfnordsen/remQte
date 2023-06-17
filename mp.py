@@ -16,6 +16,20 @@ import subprocess as sp
 from subprocess import check_output
 from samsungtvws import SamsungTVWS
 import wakeonlan
+from resources.images import images
+import base64
+class gimg:
+    def __init__(self,imagename):
+        img = QPixmap()
+        barr = QByteArray()
+        barr.append(QByteArray.fromBase64(images[imagename]))
+        img.loadFromData( barr,'PNG' )
+        self.img = img
+    def get(self):
+        icon = QIcon()
+        icon.addPixmap(self.img)
+        return icon
+
 co = ConfigParser()
 ini_tvs = ConfigParser()
 ini_tvs.read("tvs.ini")
@@ -465,42 +479,35 @@ class MainWindow(QMainWindow):
         stv = stvws()
         self.remote()
     def remote(s):
-        s.img.remQte = QIcon(resource_path("./qtui/img/icon.png"))
-        s.img.pwr = QIcon(resource_path("./qtui/img/pwr.png"))
-        s.img.up = QIcon(resource_path("./qtui/img/chup.png"))
-        s.img.down = QIcon(resource_path("./qtui/img/chdw.png"))
-        s.img.left = QIcon(resource_path("./qtui/img/arle.png"))
-        s.img.right = QIcon(resource_path("./qtui/img/arri.png"))
-
         uic.loadUi("./qtui/remote.ui",s)
-        s.setWindowIcon(s.img.remQte)
+        s.setWindowIcon(gimg('icon').get())
         s.btnpwr.clicked.connect(stv.pwr)
-        s.btnpwr.setIcon(s.img.pwr)
+        s.btnpwr.setIcon(gimg('pwr').get())
         s.btnsmarthub.clicked.connect(stv.smarthub)
         s.btnsrc.clicked.connect(stv.source)
         s.btnchup.clicked.connect(stv.chup)
-        s.btnchup.setIcon(s.img.up)
+        s.btnchup.setIcon(gimg('chup').get())
         s.btnchdw.clicked.connect(stv.chdw)
-        s.btnchdw.setIcon(s.img.down)
+        s.btnchdw.setIcon(gimg('chdw').get())
         s.btnguide.clicked.connect(stv.guide)
         s.btnchlist.clicked.connect(stv.chlist)
         s.btnvoup.clicked.connect(stv.voup)
-        s.btnvoup.setIcon(s.img.up)
+        s.btnvoup.setIcon(gimg('chup').get())
         s.btnvodw.clicked.connect(stv.vodw)
-        s.btnvodw.setIcon(s.img.down)
+        s.btnvodw.setIcon(gimg('chdw').get())
         s.btnmute.clicked.connect(stv.mute)
         s.btntools.clicked.connect(stv.tools)
         s.btninfo.clicked.connect(stv.info)
         s.btnreturn.clicked.connect(stv.rtrn)
         s.btnexit.clicked.connect(stv.exit)
         s.btnup.clicked.connect(stv.up)
-        s.btnup.setIcon(s.img.up)
+        s.btnup.setIcon(gimg('chup').get())
         s.btndown.clicked.connect(stv.down)
-        s.btndown.setIcon(s.img.down)
+        s.btndown.setIcon(gimg('chdw').get())
         s.btnleft.clicked.connect(stv.left)
-        s.btnleft.setIcon(s.img.left)
+        s.btnleft.setIcon(gimg('arle').get())
         s.btnright.clicked.connect(stv.right)
-        s.btnright.setIcon(s.img.right)
+        s.btnright.setIcon(gimg('arri').get())
         s.btnok.clicked.connect(stv.enter)
         s.btnrwd.clicked.connect(stv.rwd)
         s.btnplay.clicked.connect(stv.play)
