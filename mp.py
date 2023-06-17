@@ -88,7 +88,10 @@ class stvws:
             cnf[i].name = self.name
             cnf[i].tv = SamsungTVWS(c['dst'],port=self.port,token=c['token'],name=self.name)
         self.cnf = cnf
-        self.setDefault(i)
+        if len(cnf) == 0:
+            self.default = '0.0.0.0'
+        else:
+            self.setDefault(i)
         #print(len(cnf))
     def newwrkr(self):
         self.worker = Worker(self.pushworker)
@@ -289,7 +292,8 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.counter = 0
-        if len(ini_tvs) == 0:
+        print(len(ini_tvs.sections()),ini_tvs.sections())
+        if len(ini_tvs.sections()) == 0:
             uic.loadUi("./qtui/main_start.ui", self)
             self.btnscan.clicked.connect(self.network)
         else:
@@ -308,7 +312,7 @@ class MainWindow(QMainWindow):
         self.timer.start()
 #            self.remote()
     def start(self):
-        if len(ini_tvs)>0:
+        if len(ini_tvs.sections())>0:
             self.remote()
             
     def network(self):
@@ -555,7 +559,7 @@ class MainWindow(QMainWindow):
             self.threadpool.start(stv.worker)
             #print(self.stvw,len(stv.pque))
 
-        if self.counter%10==0:
+        if self.counter%10==0 and len(ini_tvs.sections())>0:
             self.tvup = True if self.nett.png(stv.default) == 0 else False
         if self.counter%120==0 or self.counter=='3':
             pass
