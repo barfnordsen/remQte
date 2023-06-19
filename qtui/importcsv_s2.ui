@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>271</height>
+    <width>544</width>
+    <height>314</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>-1</x>
       <y>0</y>
-      <width>371</width>
+      <width>551</width>
       <height>31</height>
      </rect>
     </property>
@@ -48,8 +48,8 @@ padding:0 0 0 5;</string>
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>351</width>
-      <height>31</height>
+      <width>541</width>
+      <height>51</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -57,11 +57,12 @@ padding:0 0 0 5;</string>
       <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <pointsize>7</pointsize>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>please check the below output for errors. if it looks reasonable for you please press [import].</string>
+        <string>The following data is ready for import. Push &quot;Import&quot; to import channel list.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -77,9 +78,9 @@ padding:0 0 0 5;</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
-      <width>351</width>
-      <height>121</height>
+      <y>90</y>
+      <width>361</width>
+      <height>201</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -97,42 +98,57 @@ padding:0 0 0 5;</string>
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_4">
+   <widget class="QWidget" name="verticalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>190</y>
+      <x>380</x>
+      <y>220</y>
       <width>160</width>
-      <height>51</height>
+      <height>61</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
      <item>
-      <widget class="QPushButton" name="btnback">
+      <widget class="QPushButton" name="btncancel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
        <property name="text">
-        <string>back</string>
+        <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_5">
+   <widget class="QWidget" name="verticalLayoutWidget_6">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>190</y>
+      <x>380</x>
+      <y>100</y>
       <width>160</width>
-      <height>51</height>
+      <height>61</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
      <item>
-      <widget class="QPushButton" name="btnimp">
+      <widget class="QPushButton" name="btnimport">
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
        <property name="text">
-        <string>import</string>
+        <string>&amp;Import</string>
        </property>
       </widget>
      </item>

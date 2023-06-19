@@ -1,23 +1,27 @@
+import time
+import traceback
+import sys
+import os
+import xml.etree.ElementTree as ET
+import urllib
+import re
+import subprocess as sp
+import wakeonlan
+import base64
+import channelimport
+import resources.importzip
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6 import uic
 from PyQt6.QtCore import *
-
 from ssdpy import SSDPClient
 from netifaces import interfaces, ifaddresses, AF_INET
-import time
-import traceback, sys, os
-import xml.etree.ElementTree as ET
-import urllib
 from urllib import request
-import re
 from configparser import ConfigParser
-import subprocess as sp
 from subprocess import check_output
 from samsungtvws import SamsungTVWS
-import wakeonlan
 from resources.images import images
-import base64
+
 class gimg:
     def __init__(self,imagename):
         img = QPixmap()
@@ -37,13 +41,7 @@ ini_chn = ConfigParser()
 ini_chn.read("channels.ini")
 class pseudo:
     pass
-def resource_path(relative_path):
-        try:
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
 
-        return os.path.join(base_path, relative_path)
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -106,14 +104,12 @@ class stvws:
             self.default = '0.0.0.0'
         else:
             self.setDefault(i)
-        #print(len(cnf))
     def newwrkr(self):
         self.worker = Worker(self.pushworker)
         self.worker.signals.finished.connect(self.workerdone)
 #        self.worker.signals.progress.connect(pseudo)
 
     def setDefault(self,ip):
-        #print(self.cnf)
         self.default = ip
         self.rc = self.cnf[ip]
     def register(self):
@@ -122,7 +118,6 @@ class stvws:
         if t.token != self.rc.token:
             #print('token changed.')
             self.__updToken(t.token)
-        #print(t.token)
         t.close()
     def __updToken(self,token):
         self.rc.token = token
@@ -133,18 +128,6 @@ class stvws:
     def push(self, btn, val=""):
         if window.tvup:
             self.pque.append(btn)
-            #print('queing:%s'%btn)
-#            print(self.pque)
-#            self.pushworker()
-#            t = self.rc.tv
-#            t.open()
-#            if t.token != self.rc.token:
-#                print('new token')
-#                self.__updToken(t.token)
-#                t.close()
-#                self.push(btn,val)
-#            t.send_key(btn)
-#            t.close()
         elif window.tvup==False and btn == 'KEY_POWER':
             wakeonlan.send_magic_packet(self.rc.mac, interface=self.rc.src)
     def pushworker(self, progress_callback):
@@ -153,7 +136,6 @@ class stvws:
             t = self.rc.tv
             t.open()
             q = self.pque
-            #print(len(q))
             rm = []
             for i in q:
                 if t.token != self.rc.token:
@@ -161,10 +143,8 @@ class stvws:
                     self.__updToken(t.token)
                     self.push(i)
                     t.close() 
-                #print("worker: sending key: %s"%i)
                 t.send_key(i)
                 rm.append(i)
-#                self.pque.remove(i)
             t.close()
             for i in rm:
                 #print('worker: removing %s from queue'%i)
@@ -296,7 +276,6 @@ class networks:
 
 class MainWindow(QMainWindow):
     platform = sys.platform
-    #print('running on:  %s'%platform)
     nett = networks()
     img = pseudo()
     tvup = False
@@ -306,7 +285,6 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.counter = 0
-        print(len(ini_tvs.sections()),ini_tvs.sections())
         if len(ini_tvs.sections()) == 0:
             uic.loadUi("./qtui/main_start.ui", self)
             self.btnscan.clicked.connect(self.network)
@@ -324,11 +302,51 @@ class MainWindow(QMainWindow):
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.timeloop)
         self.timer.start()
-#            self.remote()
     def start(self):
         if len(ini_tvs.sections())>0:
             self.remote()
-            
+    def importch(self):
+        self.w = uic.loadUi("./qtui/importcsv_s1.ui")
+        self.w.show()
+        self.w.btnchoosefile.clicked.connect(self.open_filedialog)
+        self.w.btncancel.clicked.connect(self.w.close)
+    @pyqtSlot()
+    def open_filedialog(self):
+        fname = QFileDialog.getOpenFileName(
+        self,
+        "Open File",
+        "",
+        "ZIP File (*.zip);;",
+        )
+        self.w.lineEdit.setText(fname[0])
+        self.zipfile = fname[0]
+        self.w.activateWindow()
+        uic.loadUi("./qtui/importcsv_s2.ui", self.w)
+
+        rz = resources.importzip.readzip(fname[0])
+        chnls = rz.importdata()
+        tb = self.w.tableWidget
+        it = QTableWidgetItem
+        tb.setColumnCount(3)
+        tb.setHorizontalHeaderLabels(("Ch.","Name","Type"))
+#        tb.setRowCount(len(chnls))
+        o = 0
+        self.chn = {}
+        for itm in chnls:
+            if itm['type'] == 'iptv':
+                continue
+            self.chn[str(itm['channel'])] = itm
+            tb.insertRow(tb.rowCount())
+            tb.setItem(o,0, it(str(itm['channel'])))
+            tb.setItem(o,1, it(itm['name']))
+            tb.setItem(o,2, it(itm['type']))
+            o += 1
+        self.w.btnimport.clicked.connect(self.importCH)
+        self.w.btnimport.setEnabled(True)
+        self.w.btncancel.clicked.connect(self.w.close)
+#        self.pushButton_2.clicked.connect(self.step2)
+        
+    #    importapp.exec()
     def network(self):
         uic.loadUi("./qtui/main_scan_choose_nets.ui", self)
         self.progressBar.setVisible(False)
@@ -436,7 +454,6 @@ class MainWindow(QMainWindow):
         tb.setColumnWidth(2, 65);
         tb.setHorizontalHeaderLabels(("cb","TV","supported"))
         tb.setRowCount(len(self.tvsfound))
-        #print("THREAD COMPLETE!")
         o = 0
         cbox = {}
         self.importtvs = {}
@@ -459,7 +476,6 @@ class MainWindow(QMainWindow):
                     cbox[itm]['Qcb'].setEnabled(False)
                     cbox[itm]['Qcb'].setChecked(False)
             except:
-                #print('jibbet nich')
                 pass
             tb.setItem(o,2, it(comp))
 #           tb.setItem(o,2, it(itm['type']))
@@ -478,6 +494,20 @@ class MainWindow(QMainWindow):
             ini_tvs.read('tvs.ini')
         stv = stvws()
         self.remote()
+    def importCH(self):
+        for c in self.chn:
+            ini_chn[c] = self.chn[c]
+        with open('channels.ini','w') as conf:
+            ini_chn.write(conf)
+            ini_chn.read('channels.ini')
+
+        self.w.close()
+        if len(ini_chn.sections())>0:
+            self.btnimportchannels.setVisible(False)
+        for i in ini_chn.sections():
+            
+            self.comboBox.addItem("%s %s"%(ini_chn[i]['type'].upper(), ini_chn[i]['name']), userData=i)
+        #s.comboBox.currentIndexChanged.connect(s.pr)
     def remote(s):
         uic.loadUi("./qtui/remote.ui",s)
         s.setWindowIcon(gimg('icon').get())
@@ -532,20 +562,19 @@ class MainWindow(QMainWindow):
         s.btntxt.clicked.connect(stv.txt)
         s.btnpre.clicked.connect(stv.prech)
         s.actionexit.triggered.connect(app.quit)
+        s.action_Discover.triggered.connect(s.network)
         arial7 = QFont('Arial',7)
         s.comboBox.setFont(arial7)
         if len(ini_chn.sections())>0:
             s.btnimportchannels.setVisible(False)
         for i in ini_chn.sections():
-#            print("ini_chn[i]['type']",ini_chn[i]['name'],i)
             s.comboBox.addItem("%s %s"%(ini_chn[i]['type'].upper(), ini_chn[i]['name']), userData=i)
         s.comboBox.currentIndexChanged.connect(s.pr)
+        s.btnimportchannels.clicked.connect(s.importch)
 #        s.comboBox.styleSheet = 'font: 75 7 "Arial";'
-#        print("itemData",s.comboBox.itemData(0))
 
     def pr(s,i):
         stv.channel(s.comboBox.itemData(i))
-        #print('hier ->>>>>>>%s'%s.comboBox.itemData(i))
         #return True
 
 
@@ -565,14 +594,11 @@ class MainWindow(QMainWindow):
             self.stvw = True
             stv.newwrkr()
             self.threadpool.start(stv.worker)
-            #print(self.stvw,len(stv.pque))
 
         if self.counter%10==0 and len(ini_tvs.sections())>0:
             self.tvup = True if self.nett.png(stv.default) == 0 else False
         if self.counter%120==0 or self.counter=='3':
             pass
-            #print("Counter: %d" % self.counter)
-            #print("TV UP: %s" % self.tvup)
 
 class CB:
     def __init__(self, func, *args, **kwargs):
@@ -583,6 +609,7 @@ class CB:
         self.func(event,*self.args, **self.kwargs)
 
 app = QApplication([])
+app.setWindowIcon(gimg('icon').get())
 window = MainWindow()
 t = QTimer()
 t.singleShot(1000,window.start)

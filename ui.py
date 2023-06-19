@@ -11,7 +11,7 @@ class channels:
         if int(row['Channel no.']) >= 1000:
             itm['type'] = 'radio'
         self.chnnls.append(itm)
-c = channels()
+##c = channels()
 class append(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
