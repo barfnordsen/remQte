@@ -8,7 +8,6 @@ import re
 import subprocess as sp
 import wakeonlan
 import base64
-import channelimport
 import resources.importzip
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
