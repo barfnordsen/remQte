@@ -8,7 +8,14 @@ import re
 import subprocess as sp
 import wakeonlan
 import base64
-import resources.importzip
+try:
+    import resources.importzip
+except:
+    import remQte.resources.importzip
+try:
+    from resources.images import images
+except:
+    from remQte.resources.images import images
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6 import uic
@@ -19,7 +26,6 @@ from urllib import request
 from configparser import ConfigParser
 from subprocess import check_output
 from samsungtvws import SamsungTVWS
-from resources.images import images
 
 class gimg:
     def __init__(self,imagename):
@@ -33,14 +39,20 @@ class gimg:
         icon.addPixmap(self.img)
         return icon
 
-co = ConfigParser()
-ini_tvs = ConfigParser()
-ini_tvs.read("tvs.ini")
-ini_chn = ConfigParser()
-ini_chn.read("channels.ini")
+def initconfigs():
+    global path_ini_tvs, path_ini_chn, ini_tvs, ini_chn
+    path_ini_tvs = "%s/tvs.ini"%os.path.dirname(__file__) 
+    path_ini_chn = "%s/channels.ini"%os.path.dirname(__file__)
+
+    ini_tvs = ConfigParser()
+    ini_tvs.read(path_ini_tvs)
+    ini_chn = ConfigParser()
+    ini_chn.read(path_ini_chn)
+
 class pseudo:
     pass
-
+def pth(f):
+    return os.path.dirname(__file__)+f
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -83,7 +95,7 @@ class stvws:
     pque = []
     def __init__(self):
         cnf = {}
-        ini_tvs.read('tvs.ini')
+        ini_tvs.read(path_ini_tvs)
         for i in ini_tvs.sections():
             c = ini_tvs[i]
             cnf[i] = pseudo()
@@ -122,7 +134,7 @@ class stvws:
         self.rc.token = token
         self.cnf[self.default].token = token
         ini_tvs[self.default]['token'] = token
-        with open('tvs.ini', 'w') as conf:
+        with open(path_ini_tvs, 'w') as conf:
             ini_tvs.write(conf)
     def push(self, btn, val=""):
         if window.tvup:
@@ -285,12 +297,12 @@ class MainWindow(QMainWindow):
 
         self.counter = 0
         if len(ini_tvs.sections()) == 0:
-            uic.loadUi("./qtui/main_start.ui", self)
+            uic.loadUi(pth("/qtui/main_start.ui"), self)
             self.btnscan.clicked.connect(self.network)
         else:
             stv = stvws()
             self.tvup = True if self.nett.png(stv.default) == 0 else False
-            uic.loadUi("./qtui/remote.ui", self)
+            uic.loadUi(pth("/qtui/remote.ui"), self)
 
         self.show()
         
@@ -305,7 +317,7 @@ class MainWindow(QMainWindow):
         if len(ini_tvs.sections())>0:
             self.remote()
     def importch(self):
-        self.w = uic.loadUi("./qtui/importcsv_s1.ui")
+        self.w = uic.loadUi(pth("/qtui/importcsv_s1.ui"))
         self.w.show()
         self.w.btnchoosefile.clicked.connect(self.open_filedialog)
         self.w.btncancel.clicked.connect(self.w.close)
@@ -320,9 +332,13 @@ class MainWindow(QMainWindow):
         self.w.lineEdit.setText(fname[0])
         self.zipfile = fname[0]
         self.w.activateWindow()
-        uic.loadUi("./qtui/importcsv_s2.ui", self.w)
-
-        rz = resources.importzip.readzip(fname[0])
+        uic.loadUi(pth("/qtui/importcsv_s2.ui"), self.w)
+        if fname[0] == '':
+            return True
+        try:
+            rz = resources.importzip.readzip(fname[0])
+        except:
+            rz = remQte.resources.importzip.readzip(fname[0])
         chnls = rz.importdata()
         tb = self.w.tableWidget
         it = QTableWidgetItem
@@ -347,7 +363,7 @@ class MainWindow(QMainWindow):
         
     #    importapp.exec()
     def network(self):
-        uic.loadUi("./qtui/main_scan_choose_nets.ui", self)
+        uic.loadUi(pth("/qtui/main_scan_choose_nets.ui"), self)
         self.progressBar.setVisible(False)
         self.cb = {}
         self.nett.get()
@@ -444,7 +460,7 @@ class MainWindow(QMainWindow):
         #print(s)
 
     def thread_complete(self):
-        uic.loadUi("./qtui/main_scan_nets.ui", self)
+        uic.loadUi(pth("/qtui/main_scan_nets.ui"), self)
         tb = self.tableWidget
         it = QTableWidgetItem
         tb.setColumnCount(3)
@@ -486,19 +502,19 @@ class MainWindow(QMainWindow):
         for i in self.importtvs:
             if self.importtvs[i] == True:
                 tvs = self.tvsfound
-                co[i] = tvs[i]
+                ini_tvs[i] = tvs[i]
 
-        with open('tvs.ini', 'w') as conf:
-            co.write(conf)
-            ini_tvs.read('tvs.ini')
+        with open(path_ini_tvs, 'w') as conf:
+            ini_tvs.write(conf)
+            ini_tvs.read(path_ini_tvs)
         stv = stvws()
         self.remote()
     def importCH(self):
         for c in self.chn:
             ini_chn[c] = self.chn[c]
-        with open('channels.ini','w') as conf:
+        with open(path_ini_chn,'w') as conf:
             ini_chn.write(conf)
-            ini_chn.read('channels.ini')
+            ini_chn.read(path_ini_chn)
 
         self.w.close()
         if len(ini_chn.sections())>0:
@@ -508,7 +524,7 @@ class MainWindow(QMainWindow):
             self.comboBox.addItem("%s %s"%(ini_chn[i]['type'].upper(), ini_chn[i]['name']), userData=i)
         #s.comboBox.currentIndexChanged.connect(s.pr)
     def remote(s):
-        uic.loadUi("./qtui/remote.ui",s)
+        uic.loadUi(pth("/qtui/remote.ui"),s)
         s.setWindowIcon(gimg('icon').get())
         s.btnpwr.clicked.connect(stv.pwr)
         s.btnpwr.setIcon(gimg('pwr').get())
@@ -606,11 +622,15 @@ class CB:
         self.kwargs = kwargs
     def __call__(self,event):
         self.func(event,*self.args, **self.kwargs)
+def startapp():
+    global app, window
+    initconfigs()
+    app = QApplication([])
+    app.setWindowIcon(gimg('icon').get())
+    window = MainWindow()
+    t = QTimer()
+    t.singleShot(1000,window.start)
+    sys.exit(app.exec())
 
-app = QApplication([])
-app.setWindowIcon(gimg('icon').get())
-window = MainWindow()
-t = QTimer()
-t.singleShot(1000,window.start)
-sys.exit(app.exec())
-
+if __name__ == '__main__':
+    startapp()

@@ -1,9 +1,7 @@
 import zipfile, io, os
 import sqlite3, codecs
 import tempfile
-tmpdir = tempfile.gettempdir()+'\\remQte\\'
-if not os.path.exists(tmpdir):
-    os.makedirs(tmpdir)
+
 #print(tmpdir)
 class channels:
     chnnls = []
@@ -51,6 +49,9 @@ class sqschnell:
                     chs.add(i)
         self.con.close()
 class readzip:
+    tmpdir = tempfile.gettempdir()+'/remQte/'
+    if not os.path.exists(tmpdir):
+        os.makedirs(tmpdir)
     def __init__(self,zipf):
         self.zipf = zipf
     def importdata(self):
@@ -61,9 +62,9 @@ class readzip:
             for file in myzip.namelist():
                 if file.endswith('.xml'):
                     continue
-                myzip.extract(file,tmpdir)
-        for fn in os.listdir(tmpdir):
-            f = os.path.join(tmpdir, fn)
+                myzip.extract(file,self.tmpdir)
+        for fn in os.listdir(self.tmpdir):
+            f = os.path.join(self.tmpdir, fn)
             if os.path.isfile(f):
                 #print("processing: %s"%f)
                 sql = sqschnell(f,fn)
