@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "remQte"
+version = "0.1.1.1"
+authors = [{ name="Philipp M. Nöhren", email="remQte@proton.me" }]
+description = "Remote-control GUI for Samsung Smart TVs, newer than 2016."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+dependencies = [
+	"samsungtvws",
+	"wakeonlan",
+	"PyQt6",
+	"netifaces",
+	"ssdpy"
+]
+[project.urls]
+"Homepage" = "https://github.com/barfnordsen/remQte"
+"Bug Tracker" = "https://github.com/barfnordsen/remQte/issues"
+[project.gui-scripts]
+remQte = "remQte.remQte:startapp"
