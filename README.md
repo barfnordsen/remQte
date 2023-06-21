@@ -1,9 +1,9 @@
- # *remQte*              ![onoff](https://raw.githubusercontent.com/barfnordsen/remQte/main/docs/img/icon.png) 
+ # *remQte*              ![onoff](https://raw.githubusercontent.com/barfnordsen/remQte/main/src/remQte/docs/img/icon.png) 
 
 Remote Control for Samsung smart TVs newer than 2016.
 
 
-![screenshot remQte main window](https://raw.githubusercontent.com/barfnordsen/remQte/main/docs/img/screenshot.png)
+![screenshot remQte main window](https://raw.githubusercontent.com/barfnordsen/remQte/main/src/remQte/docs/img/screenshot.png)
 
 ## Requirements
 * python3.9+
