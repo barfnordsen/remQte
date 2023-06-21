@@ -1,9 +1,9 @@
- # *remQte*              ![onoff](/docs/img/icon.png) 
+ # *remQte*              ![onoff](https://raw.githubusercontent.com/barfnordsen/remQte/main/docs/img/icon.png) 
 
 Remote Control for Samsung smart TVs newer than 2016.
 
 
-![screenshot remQte main window](/docs/img/screenshot.png)
+![screenshot remQte main window](https://raw.githubusercontent.com/barfnordsen/remQte/main/docs/img/screenshot.png)
 
 ## Requirements
 * python3.9+
@@ -13,10 +13,29 @@ Remote Control for Samsung smart TVs newer than 2016.
 * ssdpy
 
 ## Install
-```
-pip install remQte
 
-run remQte[.exe]
+### Linux and co.
+```
+python -m pip install remQte
+
+remQte
+```
+### Windows
+```
+py -m pip install remQte
+
+remQte.exe
+```
+
+### Build Python Package from source
+
+```
+git clone https://github.com/barfnordsen/remQte.git
+
+cd remQte
+
+python -m build
+
 ```
 ## Features
 
