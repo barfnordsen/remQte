@@ -14,7 +14,9 @@ Remote Control for Samsung smart TVs newer than 2016.
 
 ## Install
 ```
-git clone https://github.com/barfnordsen/remQte.git
+pip install remQte
+
+run remQte[.exe]
 ```
 ## Features
 
