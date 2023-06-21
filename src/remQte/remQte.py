@@ -276,7 +276,7 @@ class networks:
         return "%s.%s.%s.0"%(ip[0], ip[1], ip[2])
     def png(self,remoteip):
         if sys.platform.startswith('win'):
-            ping = sp.Popen('ping -n 1 -w 10 %s'%remoteip,stdout=sp.PIPE)
+            ping = sp.Popen('ping -n 1 -w 10 %s'%remoteip,stdout=sp.PIPE,creationflags=sp.CREATE_NO_WINDOW)
         else:
             pngstr = '/usr/bin/ping'
             ping = sp.Popen([pngstr,'-W 0.2','-c 1',remoteip],stdout=sp.PIPE)

@@ -28,3 +28,9 @@ dependencies = [
 "Bug Tracker" = "https://github.com/barfnordsen/remQte/issues"
 [project.gui-scripts]
 remQte = "remQte.remQte:startapp"
+[tool.hatch.build] 
+exclude = [
+	"*~",
+	"*.xcf",
+	"/helpersandstuff"
+]
