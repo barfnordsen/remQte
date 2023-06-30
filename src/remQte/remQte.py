@@ -525,7 +525,7 @@ class MainWindow(QMainWindow):
         #s.comboBox.currentIndexChanged.connect(s.pr)
     def remote(s):
         uic.loadUi(pth("/qtui/remote.ui"),s)
-        s.setWindowIcon(gimg('icon').get())
+        #s.setWindowIcon(gimg('icon').get())
         s.btnpwr.clicked.connect(stv.pwr)
         s.btnpwr.setIcon(gimg('pwr').get())
         s.btnsmarthub.clicked.connect(stv.smarthub)
@@ -625,9 +625,20 @@ class CB:
 def startapp():
     global app, window
     initconfigs()
+    if sys.platform.startswith('win'):
+        import ctypes
+        myappid = u'phnoe.remQte.remQte.0.2' # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     app = QApplication([])
-    app.setWindowIcon(gimg('icon').get())
+    app_icn = QIcon()
+
+    app_icn.addFile(pth('/resources/icon/icon16x16.png'),QSize(16,16))
+    app_icn.addFile(pth('/resources/icon/icon24x24.png'),QSize(24,24))
+    app_icn.addFile(pth('/resources/icon/icon32x32.png'),QSize(32,32))
+    app_icn.addFile(pth('/resources/icon/icon48x48.png'),QSize(48,48))
+    app_icn.addFile(pth('/resources/icon/icon256x256.png'),QSize(256,256))
     window = MainWindow()
+    app.setWindowIcon(app_icn)
     t = QTimer()
     t.singleShot(1000,window.start)
     sys.exit(app.exec())

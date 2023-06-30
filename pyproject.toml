@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "remQte"
-version = "0.2.0"
+version = "0.2.1"
 authors = [{ name="Philipp M. Nöhren", email="remQte@proton.me" }]
 description = "Remote-control GUI for Samsung Smart TVs, newer than 2016."
 readme = "README.md"
@@ -23,6 +23,7 @@ dependencies = [
 	"netifaces",
 	"ssdpy"
 ]
+#icon = "src/remQte/docs/img/icon"
 [project.urls]
 "Homepage" = "https://github.com/barfnordsen/remQte"
 "Bug Tracker" = "https://github.com/barfnordsen/remQte/issues"
